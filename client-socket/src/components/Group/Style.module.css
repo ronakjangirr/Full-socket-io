@@ -1,0 +1,22 @@
+.mainBox{
+    margin: 10px;
+    width: 25%;
+    height: 30vh; 
+    border: 1px solid black;
+    border-radius: 10px;
+}
+
+.childFirst{
+    display: flex;
+    justify-content: space-evenly;
+}
+
+/* Make the list scrollable */
+.scrollableList {
+    flex-grow: 1; /* Allow the list to take up the remaining space */
+    overflow-y: auto; /* Enable vertical scrolling */
+  
+    border-top: 1px solid #ccc;
+    padding-top: 10px;
+  }
+  

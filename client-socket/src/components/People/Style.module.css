@@ -1,0 +1,7 @@
+.mainBox{
+    margin: 10px;
+    width: 25%;
+    height: 45vh; 
+    border: 1px solid black;
+    border-radius: 10px;
+}
