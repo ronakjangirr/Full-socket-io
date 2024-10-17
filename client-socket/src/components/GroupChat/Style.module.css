@@ -15,16 +15,17 @@
     border: 1px solid black;
     border-radius: 10px;
     overflow-y: auto; /* Enable vertical scrolling */
+
 }
 
 .chatBoxParent{
     align-items: center;
 }
 
-.inputBox {
-    width: 30vw; /* Adjust to fit inside the chat box */
-  }
-  
+.inputBox{
+    width: 30vw; /* Adjusted to fit inside the chat box */
+}
+
 .msgBox{
     display: flex;
     justify-content: space-evenly;

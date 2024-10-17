@@ -1,22 +1,39 @@
-.mainBox{
+.mainBox {
     margin: 10px;
-    width: 25%;
+    width: 25vw;
+    padding: 10px;
     height: 30vh; 
     border: 1px solid black;
     border-radius: 10px;
-}
-
-.childFirst{
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .childFirst {
     display: flex;
     justify-content: space-evenly;
-}
-
-/* Make the list scrollable */
-.scrollableList {
+  }
+  
+  .scrollableList {
     flex-grow: 1; /* Allow the list to take up the remaining space */
     overflow-y: auto; /* Enable vertical scrolling */
-  
-    border-top: 1px solid #ccc;
     padding-top: 10px;
+    margin-top: 10px;
+  }
+  
+  .scrollableList ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .scrollableList li {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    background-color: #f9f9f9;
   }
   
