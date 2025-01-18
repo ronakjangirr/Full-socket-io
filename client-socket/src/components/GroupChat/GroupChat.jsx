@@ -5,13 +5,41 @@ import Form from "react-bootstrap/Form";
 import styles from "./Style.module.css";
 
 function GroupChat(props) {
-    const {selectedGroup}= props;
-    const [groupChat, setGroupChat] = useState([]);
-    const [message, setMessage] = useState('');
+  const { selectedGroup, profileName, socket } = props;
+  const [roomChat, setRoomChat] = useState([]);
+  const [roomChatMsg, setRoomChatMsg] = useState("");
 
-    const handleSend=()=>{
+  const handleSend = () => {
+    let userRoomMessage = {
+      roomId: selectedGroup.id,
+      roomName: selectedGroup.name,
+      userName: profileName,
+      userMessage: roomChatMsg,
+    };
+    socket.emit("roomChat", userRoomMessage);
+    setRoomChatMsg('')
+  };
 
+  useEffect(() => {
+    // Listener for incoming room messages
+    socket.on("myRoomChat", (selectedRoomMsg) => {
+      console.log("Received chats:", selectedRoomMsg);
+    // Only append the latest message
+    if (selectedRoomMsg.length > 0) {
+      setRoomChat(selectedRoomMsg);
+
+    }else{
+      setRoomChat(selectedRoomMsg)
     }
+    });
+
+    return () => {
+      socket.off("myRoomChat"); // Clean up on unmount
+    };
+  }, [socket]);
+
+  console.log({ roomChat });
+
   return (
     <>
       <div className={styles.mainBox}>
@@ -19,13 +47,15 @@ function GroupChat(props) {
           <h4>Group Chat</h4>
         </div>
         <div>
-          <h5>Group Name:{selectedGroup} </h5>
+          <h5>Group Name:{selectedGroup.name} </h5>
         </div>
         <div className={styles.chatBoxParent}>
           <div className={styles.chatBox}>
-            {groupChat.map((msg, index) => (
-              <ul>
-                  <li>{msg}</li>
+            {roomChat.map((msg, index) => (
+              <ul key={index}>
+                <li>
+                  <strong>{msg.userName}</strong>: {msg.message}
+                </li>
               </ul>
             ))}
           </div>
@@ -36,8 +66,8 @@ function GroupChat(props) {
             <Form.Control
               type="text"
               placeholder="Send Your Message"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
+              value={roomChatMsg}
+              onChange={(e) => setRoomChatMsg(e.target.value)}
             />
           </div>
           <div>

@@ -5,7 +5,8 @@ import Form from "react-bootstrap/Form";
 
 function Group({ sendGroupName, socket }) {
   const [name, setName] = useState("");
-  const [groups, setGroups] = useState([]);
+  const [rooms, setRooms] = useState([]);
+  const [selectedGroup, setSelectedGroup] = useState(null); // Track which group the user has joined
 
   const handleSet = () => {
     if (name.trim()) {
@@ -16,36 +17,54 @@ function Group({ sendGroupName, socket }) {
 
   useEffect(() => {
     socket.on("groupCreated", (groupList) => {
-      console.log(groupList);
-      setGroups(groupList); // Update the group list
+      console.log({ groupList });
+      setRooms(groupList); // Update the group list
     });
 
     // Cleanup listener on unmount to prevent memory leaks
     return () => {
       socket.off("groupCreated");
     };
-  }, [socket]); // Add `socket` as the dependency
+  }, [socket, rooms]); // Add `socket` as the dependency
 
   const handleDelete = (deleteSelectedGroup) => {
-      console.log(deleteSelectedGroup)
-
-      socket.emit("deleteGroup", deleteSelectedGroup)
-
-      // setGroups((prev) => prev.filter((_, index) => index !== indexToDelete)); // Remove the item at the given index
+    console.log({ deleteSelectedGroup });
+    socket.emit("deleteGroup", deleteSelectedGroup);
+    if (selectedGroup?.id === deleteSelectedGroup) {
+      setSelectedGroup(null); // Clear the selected group
+      sendGroupName(null); // Also inform the parent component to clear the GroupChat
+    }
   };
 
-  const handleSelectGroup = (groupName) => {
-    debugger
-    sendGroupName(groupName);
+  const handleSelectGroup = (roomName, roomId) => {
+    const group = { name: roomName, id: roomId };
+    setSelectedGroup(group); // Send the whole group object to the parent
+    sendGroupName(group);
   };
 
-  const handleJoin=()=>{
+  console.log({selectedGroup})
 
-  }
+  const handleJoin = (roomName, roomId) => {
+    // if (selectedGroup?.id === roomId) {
+    //   alert(`You are already in this Room: ${roomName}`);
+    // } else {
+      debugger
+      socket.emit("joinGroup", { id: roomId, roomName });
 
-  const handleLeave=()=>{
+    //   handleSelectGroup(roomName, roomId); // Update selected group
+    // }
+  };
 
-  }
+  const handleLeave = (roomId) => {
+    if (selectedGroup === roomId) {
+      socket.emit("leaveRoom", roomId);
+      setSelectedGroup(null); // Clear the selected group
+      alert(`Left Room: ${rooms.find((room) => room.id === roomId).name}`);
+    } else {
+      alert("You are not part of this Room");
+    }
+  };
+
   return (
     <>
       <div className={styles.mainBox}>
@@ -66,16 +85,21 @@ function Group({ sendGroupName, socket }) {
         </div>
 
         <div className={styles.scrollableList}>
-          {groups.length === 0 ? (
+          {rooms.length === 0 ? (
             <p>No group created</p>
           ) : (
-            groups.map((group) => (
-              <ul key={group.id}>
-                <li onClick={() => handleSelectGroup(group.name)}>
-                  {group.name}
-                  <Button onClick={handleJoin}>Join</Button>
-                  <Button onClick={handleLeave}>X</Button>
-                  <Button onClick={() => handleDelete(group.id)}>Delete</Button>
+            rooms.map((room) => (
+              <ul key={room.id}>
+                <li>
+                  {room.name}
+                  <Button onClick={() => handleSelectGroup(room.name, room.id)}>
+                    Select
+                  </Button>
+                  <Button onClick={() => handleJoin(room.name, room.id)}>
+                    Join
+                  </Button>
+                  <Button onClick={() => handleLeave(room.id)}>X</Button>
+                  <Button onClick={() => handleDelete(room.id)}>Delete</Button>
                 </li>
               </ul>
             ))
